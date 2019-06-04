@@ -30,7 +30,6 @@ steps:
   displayName: 'Lint Results'
   condition: succeededOrFailed()
   inputs:
-    failTaskOnFailedTests: true
     testResultsFormat: 'JUnit'
     testResultsFiles: 'test/unit/coverage/lint.xml'
     testRunTitle: 'Lint'
