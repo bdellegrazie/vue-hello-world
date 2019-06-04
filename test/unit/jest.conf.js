@@ -10,7 +10,7 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1'
   },
-  testURL: "http://localhost/",
+  testURL: 'http://localhost/',
   transform: {
     '^.+\\.js$': '<rootDir>/node_modules/babel-jest',
     '.*\\.(vue)$': '<rootDir>/node_modules/vue-jest'
@@ -27,7 +27,7 @@ module.exports = {
     '!**/node_modules/**'
   ],
   coverageReporters: [
-    "text-summary", "cobertura"
+    'text-summary', 'cobertura'
   ],
   reporters: [
     'default',
