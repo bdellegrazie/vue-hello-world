@@ -22,6 +22,7 @@ steps:
 
 - task: Npm@1
   displayName: 'Lint'
+  continueOnError: true
   inputs:
     command: custom
     customCommand: 'run lint -- --format junit --output-file test/unit/coverage/lint.xml'
@@ -29,7 +30,8 @@ steps:
   displayName: 'Lint Results'
   condition: succeededOrFailed()
   inputs:
-    testRunner: JUnit
+    failTaskOnFailedTests: true
+    testResultsFormat: 'JUnit'
     testResultsFiles: 'test/unit/coverage/lint.xml'
     testRunTitle: 'Lint'
 - task: Npm@1
@@ -52,7 +54,7 @@ steps:
   displayName: 'Unit Test Results'
   condition: succeededOrFailed()
   inputs:
-    testRunner: JUnit
+    testResultsFormat: 'JUnit'
     testResultsFiles: 'test/unit/coverage/junit.xml'
     testRunTitle: 'Unit'
 - task: Npm@1
