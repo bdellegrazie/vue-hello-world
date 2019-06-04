@@ -22,17 +22,9 @@ steps:
 
 - task: Npm@1
   displayName: 'Lint'
-  continueOnError: true
   inputs:
     command: custom
-    customCommand: 'run lint -- --format junit --output-file test/unit/coverage/lint.xml'
-- task: PublishTestResults@2
-  displayName: 'Lint Results'
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFormat: 'JUnit'
-    testResultsFiles: 'test/unit/coverage/lint.xml'
-    testRunTitle: 'Lint'
+    customCommand: 'run lint -- --format vso'
 - task: Npm@1
   displayName: 'Build App'
   inputs:
