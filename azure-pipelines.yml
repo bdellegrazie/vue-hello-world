@@ -11,27 +11,38 @@ pool:
 
 steps:
 - task: NodeTool@0
+  displayName: 'Install NodeJS'
   inputs:
     versionSpec: '10.x'
-  displayName: 'Install Node.js'
+- task: Npm@1
+  displayName: 'Install NodeJS Dependencies'
+  inputs:
+    command: install
 
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
-
-- script: |
-    npm run ci:unit
-  displayName: 'npm unit test'
+- task: Npm@1
+  displayName: 'Build App'
+  inputs:
+    command: custom
+    customCommand: build
+- task: Npm@1
+  displayName: 'Unit Tests'
+  inputs:
+    command: custom
+    customCommand: ci:unit
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
     testRunner: JUnit
-    testResultsFiles: '**/junit.xml'
-
+    testResultsFiles: 'test/unit/coverage/junit.xml'
 - task: PublishCodeCoverageResults@1
+  condition: succeededOrFailed()
   inputs: 
     codeCoverageTool: Cobertura
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
-    reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
+    summaryFileLocation: 'test/unit/coverage/*coverage.xml'
+    reportDirectory: 'test/unit/coverage'
+- task: Npm@1
+  displayName: 'E2E Tests'
+  inputs:
+    command: custom
+    customCommand: ci:unit
