@@ -25,5 +25,12 @@ module.exports = {
     'src/**/*.{js,vue}',
     '!src/main.js',
     '!**/node_modules/**'
+  ],
+  coverageReporters: [
+    "text-summary", "cobertura"
+  ],
+  reporters: [
+    'default',
+    ['jest-junit', {'outputDirectory': '<rootDir>/test/unit/coverage'}]
   ]
 }
