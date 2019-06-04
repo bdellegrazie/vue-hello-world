@@ -28,21 +28,27 @@ steps:
   displayName: 'Unit Tests'
   inputs:
     command: custom
-    customCommand: ci:unit
-
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
+    customCommand: 'run unit -- --ci'
+- task: Npm@1
+  displayName: 'E2E Tests'
+  condition: succeeded()
   inputs:
-    testRunner: JUnit
-    testResultsFiles: 'test/unit/coverage/junit.xml'
+    command: custom
+    customCommand: 'run e2e'
+
 - task: PublishCodeCoverageResults@1
   condition: succeededOrFailed()
   inputs: 
     codeCoverageTool: Cobertura
     summaryFileLocation: 'test/unit/coverage/*coverage.xml'
     reportDirectory: 'test/unit/coverage'
-- task: Npm@1
-  displayName: 'E2E Tests'
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
   inputs:
-    command: custom
-    customCommand: ci:unit
+    testRunner: JUnit
+    testResultsFiles: 'test/unit/coverage/junit.xml'
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: 'test/e2e/reports/**.xml'
