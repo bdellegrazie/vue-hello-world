@@ -25,7 +25,7 @@ steps:
   inputs:
     command: custom
     customCommand: 'run lint -- --format vso'
-- script: npm audit --json > audit.json
+- script: npm audit --audit-level critical --registry=https://registry.npmjs.org/ --json > audit.json
   displayName: 'Security Audit'
   continueOnError: 'true'
 - task: Npm@1
@@ -38,6 +38,7 @@ steps:
   inputs:
     command: custom
     customCommand: 'run unit -- --ci'
+
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: audit_results'
   condition: succeededOrFailed()
