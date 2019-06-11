@@ -25,6 +25,9 @@ steps:
   inputs:
     command: custom
     customCommand: 'run lint -- --format vso'
+- script: npm audit --json > audit.json
+  displayName: 'Security Audit'
+  continueOnError: 'true'
 - task: Npm@1
   displayName: 'Build App'
   inputs:
@@ -35,6 +38,12 @@ steps:
   inputs:
     command: custom
     customCommand: 'run unit -- --ci'
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: audit_results'
+  condition: succeededOrFailed()
+  inputs: 
+    PathtoPublish: 'audit.json'
+    ArtifactName: 'audit_results'
 - task: PublishCodeCoverageResults@1
   displayName: 'Unit Test Coverage'
   condition: succeededOrFailed()
