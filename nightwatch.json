@@ -1,0 +1,14 @@
+{
+  "test_settings": {
+    "chrome-headless": {
+      "desiredCapabilities": {
+        "browserName": "chrome",
+        "chromeOptions": {
+          "args": [
+            "--headless", "--disable-gpu", "--window-size=1024,768"
+          ]
+        }
+      }
+    }
+  }
+}

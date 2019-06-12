@@ -25,9 +25,17 @@ steps:
   inputs:
     command: custom
     customCommand: 'run lint -- --format vso'
+
 - script: npm audit --audit-level critical --registry=https://registry.npmjs.org/ --json > audit.json
   displayName: 'Security Audit'
   continueOnError: 'true'
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: audit_results'
+  condition: succeededOrFailed()
+  inputs: 
+    PathtoPublish: 'audit.json'
+    ArtifactName: 'audit_results'
+
 - task: Npm@1
   displayName: 'Build App'
   inputs:
@@ -37,36 +45,33 @@ steps:
   displayName: 'Unit Tests'
   inputs:
     command: custom
-    customCommand: 'run unit -- --ci'
+    customCommand: 'run test:unit -- --ci --coverage --reporters=jest-junit'
+  env:
+    JEST_JUNIT_OUTPUT_DIR: tests/unit/reports
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: audit_results'
-  condition: succeededOrFailed()
-  inputs: 
-    PathtoPublish: 'audit.json'
-    ArtifactName: 'audit_results'
 - task: PublishCodeCoverageResults@1
   displayName: 'Unit Test Coverage'
   condition: succeededOrFailed()
   inputs: 
     codeCoverageTool: Cobertura
-    summaryFileLocation: 'test/unit/coverage/*coverage.xml'
+    summaryFileLocation: 'tests/unit/reports/*coverage.xml'
 - task: PublishTestResults@2
   displayName: 'Unit Test Results'
   condition: succeededOrFailed()
   inputs:
     testResultsFormat: 'JUnit'
-    testResultsFiles: 'test/unit/coverage/junit.xml'
+    testResultsFiles: 'tests/unit/reports/junit.xml'
     testRunTitle: 'Unit'
+
 - task: Npm@1
   displayName: 'E2E Tests'
   inputs:
     command: custom
-    customCommand: 'run e2e'
+    customCommand: 'run test:e2e -- --env chrome-headless'
 - task: PublishTestResults@2
   displayName: 'E2E Test Results'
   condition: succeededOrFailed()
   inputs:
     testRunner: JUnit
-    testResultsFiles: 'test/e2e/reports/**.xml'
+    testResultsFiles: 'tests/e2e/reports/**.xml'
     testRunTitle: 'E2E'
