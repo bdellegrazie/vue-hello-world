@@ -6,72 +6,104 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'ubuntu-latest'
+pr: none
 
-steps:
-- task: NodeTool@0
-  displayName: 'Install NodeJS'
-  inputs:
-    versionSpec: '10.x'
-- task: Npm@1
-  displayName: 'Install NodeJS Dependencies'
-  inputs:
-    command: custom
-    customCommand: ci
+name: $(TeamProject)_$(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
-- task: Npm@1
-  displayName: 'Lint'
-  inputs:
-    command: custom
-    customCommand: 'run lint -- --format vso'
+stages:
+- stage: build
+  jobs:
+  - job: run_build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - checkout: self
+      clean: true
+      fetchDepth: 3
+    - task: NodeTool@0
+      displayName: 'Install NodeJS'
+      inputs:
+        versionSpec: '10.x'
+    - task: Npm@1
+      displayName: 'Install NodeJS Dependencies'
+      inputs:
+        command: custom
+        customCommand: ci
 
-- script: npm audit --audit-level critical --registry=https://registry.npmjs.org/ --json > audit.json
-  displayName: 'Security Audit'
-  continueOnError: 'true'
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: audit_results'
-  condition: succeededOrFailed()
-  inputs: 
-    PathtoPublish: 'audit.json'
-    ArtifactName: 'audit_results'
+    - task: Npm@1
+      displayName: 'Lint'
+      inputs:
+        command: custom
+        customCommand: 'run lint -- --format vso'
 
-- task: Npm@1
-  displayName: 'Build App'
-  inputs:
-    command: custom
-    customCommand: build
-- task: Npm@1
-  displayName: 'Unit Tests'
-  inputs:
-    command: custom
-    customCommand: 'run test:unit -- --ci --coverage --reporters=jest-junit'
-  env:
-    JEST_JUNIT_OUTPUT_DIR: tests/unit/reports
+    - script: npm audit --audit-level critical --registry=https://registry.npmjs.org/ --json > audit.json
+      displayName: 'Security Audit'
+      continueOnError: true
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: audit_results'
+      condition: succeededOrFailed()
+      inputs:
+        PathtoPublish: 'audit.json'
+        ArtifactName: 'audit_results'
 
-- task: PublishCodeCoverageResults@1
-  displayName: 'Unit Test Coverage'
-  condition: succeededOrFailed()
-  inputs: 
-    codeCoverageTool: Cobertura
-    summaryFileLocation: 'tests/unit/reports/*coverage.xml'
-- task: PublishTestResults@2
-  displayName: 'Unit Test Results'
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFormat: 'JUnit'
-    testResultsFiles: 'tests/unit/reports/junit.xml'
-    testRunTitle: 'Unit'
+    - task: Npm@1
+      displayName: 'Unit Tests'
+      inputs:
+        command: custom
+        customCommand: 'run test:unit -- --ci --coverage --reporters=jest-junit'
+      env:
+        JEST_JUNIT_OUTPUT_DIR: tests/unit/reports
 
-- task: Npm@1
-  displayName: 'E2E Tests'
-  inputs:
-    command: custom
-    customCommand: 'run test:e2e -- --env chrome-headless'
-- task: PublishTestResults@2
-  displayName: 'E2E Test Results'
-  condition: succeededOrFailed()
-  inputs:
-    testRunner: JUnit
-    testResultsFiles: 'tests/e2e/reports/**.xml'
-    testRunTitle: 'E2E'
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Unit Test Coverage'
+      condition: succeededOrFailed()
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: 'tests/unit/reports/*coverage.xml'
+    - task: PublishTestResults@2
+      displayName: 'Unit Test Results'
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: 'tests/unit/reports/junit.xml'
+        testRunTitle: 'Unit'
+
+    - task: Npm@1
+      displayName: 'E2E Tests'
+      inputs:
+        command: custom
+        customCommand: 'run test:e2e -- --env chrome-headless'
+    - task: PublishTestResults@2
+      displayName: 'E2E Test Results'
+      condition: succeededOrFailed()
+      inputs:
+        testRunner: JUnit
+        testResultsFiles: 'tests/e2e/reports/**.xml'
+        testRunTitle: 'E2E'
+
+    - task: Npm@1
+      displayName: 'Build App'
+      inputs:
+        command: custom
+        customCommand: 'run build'
+
+    # Build artifact publication
+    #- task: ArchiveFiles@2
+    #  displayName: 'Archive'
+    #  inputs:
+    #    rootFolderOrFile: '$(Build.SourcesDirectory)/dist'
+    #    includeRootFolder: false
+    #    archiveType: zip
+    #    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    #- task: PublishBuildArtifacts@1
+    #  displayName: 'Publish Archive'
+    #  inputs:
+    #    pathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    #    artifactName: 'distribution'
+
+    # Newer Pipeline Artifact Publication
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish'
+      inputs:
+        artifactName: 'distribution'
+        targetPath: '$(Build.SourcesDirectory)/dist'
