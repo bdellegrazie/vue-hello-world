@@ -10,12 +10,16 @@ pr: none
 
 name: $(TeamProject)_$(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
+variables:
+  appName: 'vue-hello-world'
+  vmImage: 'ubuntu-latest'
+
 stages:
 - stage: build
   jobs:
   - job: run_build
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: '$(vmImage)'
     steps:
     - checkout: self
       clean: 'outputs'
@@ -95,7 +99,7 @@ stages:
         command: custom
         customCommand: 'run build'
 
-    # Build artifact publication
+    # Build artifacts
     - task: ArchiveFiles@2
       displayName: 'Archive Distribution'
       inputs:
@@ -103,35 +107,104 @@ stages:
         includeRootFolder: false
         archiveType: zip
         archiveFile: '$(Build.ArtifactStagingDirectory)/distribution.zip'
+
+    # Publish Artifacts
     #- task: PublishBuildArtifacts@1
     #  displayName: 'Publish Archive'
     #  inputs:
     #    pathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
     #    artifactName: 'distribution'
-
-    # Newer Pipeline Artifact Publication
     - task: PublishPipelineArtifact@0
-      displayName: 'Publish'
+      displayName: 'Publish Distribution'
       inputs:
         artifactName: 'distribution'
         targetPath: '$(Build.ArtifactStagingDirectory)/distribution.zip'
 
-- stage: deploy
+- stage: provision
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  variables:
+    azureSubscription: ${{format('arm-{0}',variables['appName'])}}
+    rgName: ${{format('rg-{0}',variables['appName'])}}
+    rgLocation: 'uksouth'
   jobs:
-  - job: deploy
+  - job: run_provision
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: '$(vmImage)'
     steps:
+    - checkout: self
+      clean: 'outputs'
+      fetchDepth: 3
+    #- task: AzureCLI@1
+    #  displayName: "ResourceGroup Exists?"
+    #  inputs:
+    #    azureSubscription: 'arm-vue-hello-world'
+    #    scriptLocation: 'inlineScript'
+    #    inlineScript: "echo ###vso[task.setvariable variable=rgExists;]$(az group exists --name '$(rgName)')"
+    #    failOnStandardError: true
+
+    #- task: AzureCLI@1
+    #  displayName: "Provision ResourceGroup"
+    #  condition: not(variables['rgExists'])
+    #  inputs:
+    #    azureSubscription: 'arm-vue-hello-world'
+    #    scriptLocation: 'inlineScript'
+    #    inlineScript: "az group create --location '$(rgLocation)' --name '$(rgName)'"
+
+    # We're relying upon the task behaviour of creating the resource group if it doesn't exist
+    - task: AzureResourceGroupDeployment@2
+      displayName: 'Provision Resources'
+      inputs:
+        azureSubscription: ${{variables['azureSubscription']}}
+        resourceGroupName: ${{variables['rgName']}}
+        action: "Create Or Update Resource Group"
+        location: ${{variables['rgLocation']}}
+        templateLocation: 'Linked artifact'
+        csmfile: '$(Build.SourcesDirectory)/azure/arm/azuredeploy.json'
+        deploymentOutputs: 'arm'
+    - task: 'ARM Outputs@5'
+      inputs:
+        ConnectedServiceNameSelector: 'ConnectedServiceNameARM'
+        ConnectedServiceNameARM: ${{variables['azureSubscription']}}
+        resourceGroupName: ${{variables['rgName']}}
+        prefix: 'arm_'
+        whenLastDeploymentIsFailed: 'fail'
+
+    - task: AzureCLI@1
+      displayName: "Enable Static Website host"
+      inputs:
+        azureSubscription: ${{variables['azureSubscription']}}
+        scriptLocation: 'inlineScript'
+        inlineScript: "az storage blob service-properties update --account-name '$(arm_storageAccountName)' --static-website --404-document index.html --index-document index.html "
+    
     - task: DownloadPipelineArtifact@1
+      displayName: "Download Distribution"
       inputs:
         artifactName: 'distribution'
         targetPath: '$(System.ArtifactsDirectory)' 
-    - task: AzureWebApp@1
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    - task: ExtractFiles@1
+      displayName: "Extract Distribution"
       inputs:
-        azureSubscription: 'arm-vue-hello-world'
-        appName: 'wa-vue-hello-world'
-        appType: 'webApp'
-        resourceGroupName: 'rg-vue-hello-world'
-        package: '$(System.ArtifactsDirectory)/**/*.zip'
-        deploymentMethod: 'zipDeploy'
+        archiveFilePatterns: '$(System.ArtifactsDirectory)/distribution.zip'
+        destinationFolder: '$(System.ArtifactsDirectory)/dist'
+        cleanDestinationFolder: true
+
+    - task: AzureCLI@1
+      displayName: "Deploy App"
+      inputs:
+        azureSubscription: ${{variables['azureSubscription']}}
+        scriptLocation: 'inlineScript'
+        inlineScript: "az storage blob upload-batch -s '$(System.ArtifactsDirectory)/dist' -d \\$web --account-name '$(arm_storageAccountName)'"
+
+    - task: AzureCLI@1
+      displayName: "Retrieve Web URL"
+      inputs:
+        azureSubscription: ${{variables['azureSubscription']}}
+        scriptLocation: 'inlineScript'
+        inlineScript: echo "##vso[task.setvariable variable=webUrl;isOutput=true]$$(az storage account show --name '$(arm_storageAccountName)' --resource-group '$(rgName)' --query 'primaryEndpoints.web' --output tsv)"
+
+    - script: |
+        set +x
+        echo "[vue-hello-world](${WEBURL})" > ${SYSTEM_ARTIFACTSDIRECTORY}/weburl.md
+        echo "##vso[task.uploadsummary]${SYSTEM_ARTIFACTSDIRECTORY}/weburl.md"
+      displayName: "WebURL Summary Doc"
+      
