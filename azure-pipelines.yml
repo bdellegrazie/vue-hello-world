@@ -88,11 +88,11 @@ stages:
         testResultsFiles: 'tests/e2e/reports/**.xml'
         testRunTitle: 'E2E'
 
-    #- task: Npm@1
-    #  displayName: 'Update version'
-    #  inputs:
-    #    command: custom
-    #    customCommand: 'version $[[packageVersion]].'
+    - task: freestyle
+      displayName: Semantic Release
+      inputs:
+        gitHubServiceConnection: bdellegrazie-p-a-s
+
     - task: Npm@1
       displayName: 'Build App'
       inputs:
@@ -114,7 +114,7 @@ stages:
     #  inputs:
     #    pathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
     #    artifactName: 'distribution'
-    - task: PublishPipelineArtifact@0
+    - task: PublishPipelineArtifact@1
       displayName: 'Publish Distribution'
       inputs:
         artifactName: 'distribution'
