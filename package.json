@@ -2,20 +2,16 @@
   "name": "vue-hello-world",
   "version": "0.1.0",
   "private": true,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bdellegrazie/vue-hello-world.git"
-  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "semantic-release": "semantic-release",
+    "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
-    "test:unit": "vue-cli-service test:unit"
+    "lint": "vue-cli-service lint",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "core-js": "^2.6.5",
+    "core-js": "^3.1.2",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
     "vue-property-decorator": "^8.1.0"
@@ -24,20 +20,24 @@
     "@semantic-release/changelog": "^3.0.4",
     "@semantic-release/git": "^7.0.16",
     "@types/jest": "^24.0.13",
-    "@vue/cli-plugin-babel": "^3.8.0",
-    "@vue/cli-plugin-e2e-nightwatch": "^3.8.0",
-    "@vue/cli-plugin-typescript": "^3.8.0",
-    "@vue/cli-plugin-unit-jest": "^3.8.0",
-    "@vue/cli-service": "^3.8.0",
+    "@vue/cli": "^4.0.4",
+    "@vue/cli-plugin-babel": "^4.0.4",
+    "@vue/cli-plugin-e2e-nightwatch": "^4.0.4",
+    "@vue/cli-plugin-typescript": "^4.0.4",
+    "@vue/cli-plugin-unit-jest": "^4.0.4",
+    "@vue/cli-service": "^4.0.4",
     "@vue/test-utils": "1.0.0-beta.29",
     "babel-core": "7.0.0-bridge.0",
-    "babel-jest": "^24.8.0",
+    "chromedriver": "^77.0.0",
     "conventional-changelog-conventionalcommits": "^4.2.1",
     "jest": "^24.8.0",
     "jest-junit": "^6.4.0",
     "semantic-release": "^15.13.24",
-    "ts-jest": "^24.0.2",
     "typescript": "^3.4.3",
     "vue-template-compiler": "^2.6.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bdellegrazie/vue-hello-world.git"
   }
 }
