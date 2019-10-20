@@ -1,8 +1,12 @@
 ---
 plugins:
-  - "@semantic-release/commit-analyzer":
-      "preset": "conventionalcommits"
-  - "@semantic-release/release-notes-generator":
-      "preset": "conventionalcommits"
-  - "@semantic-release/npm"
-  - "@semantic-release/github"
+  - "@semantic-release/commit-analyzer"
+  - "@semantic-release/release-notes-generator"
+  - "@semantic-release/changelog"
+  - "@semantic-release/github":
+    assets:
+      - name: "vue-hello-world-${nextRelease.gitTag}"
+        label: "Vue Hello World (${nextRelease.gitTag}) distribution"
+        path: "dist/**"
+  - "@semantic-release/git"
+preset: "conventionalcommits"

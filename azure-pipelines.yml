@@ -88,11 +88,6 @@ stages:
         testResultsFiles: 'tests/e2e/reports/**.xml'
         testRunTitle: 'E2E'
 
-    - task: freestyle
-      displayName: Semantic Release
-      inputs:
-        gitHubServiceConnection: bdellegrazie-p-a-s
-
     - task: Npm@1
       displayName: 'Build App'
       inputs:
@@ -119,6 +114,11 @@ stages:
       inputs:
         artifactName: 'distribution'
         targetPath: '$(Build.ArtifactStagingDirectory)/distribution.zip'
+
+    - task: freestyle@0
+      displayName: Semantic Release
+      inputs:
+        gitHubServiceConnection: bdellegrazie-p-a-s
 
 - stage: provision
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
@@ -175,12 +175,12 @@ stages:
         azureSubscription: ${{variables['azureSubscription']}}
         scriptLocation: 'inlineScript'
         inlineScript: "az storage blob service-properties update --account-name '$(arm_storageAccountName)' --static-website --404-document index.html --index-document index.html "
-    
+
     - task: DownloadPipelineArtifact@1
       displayName: "Download Distribution"
       inputs:
         artifactName: 'distribution'
-        targetPath: '$(System.ArtifactsDirectory)' 
+        targetPath: '$(System.ArtifactsDirectory)'
     - task: ExtractFiles@1
       displayName: "Extract Distribution"
       inputs:
@@ -207,4 +207,4 @@ stages:
         echo "[vue-hello-world](${WEBURL})" > ${SYSTEM_ARTIFACTSDIRECTORY}/weburl.md
         echo "##vso[task.uploadsummary]${SYSTEM_ARTIFACTSDIRECTORY}/weburl.md"
       displayName: "WebURL Summary Doc"
-      
+

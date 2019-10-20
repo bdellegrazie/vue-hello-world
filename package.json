@@ -2,6 +2,10 @@
   "name": "vue-hello-world",
   "version": "0.1.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bdellegrazie/vue-hello-world.git"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -17,6 +21,8 @@
     "vue-property-decorator": "^8.1.0"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^3.0.4",
+    "@semantic-release/git": "^7.0.16",
     "@types/jest": "^24.0.13",
     "@vue/cli-plugin-babel": "^3.8.0",
     "@vue/cli-plugin-e2e-nightwatch": "^3.8.0",
