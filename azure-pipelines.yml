@@ -11,8 +11,11 @@ pr: none
 name: $(TeamProject)_$(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 
 variables:
-  appName: 'vue-hello-world'
-  vmImage: 'ubuntu-latest'
+  - group: Github
+  - name: appName
+    value: 'vue-hello-world'
+  - name: vmImage
+    value: 'ubuntu-latest'
 
 stages:
 - stage: build
@@ -115,10 +118,22 @@ stages:
         artifactName: 'distribution'
         targetPath: '$(Build.ArtifactStagingDirectory)/distribution.zip'
 
-    - task: freestyle@0
-      displayName: Semantic Release
+    - task: InstallSSHKey@0
+      displayName: 'Install Key'
       inputs:
-        gitHubServiceConnection: bdellegrazie-p-a-s
+        knownHostsEntry: >
+          github.com ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAq2A7hRGmdnm9tUDbO9IDSwBK6TbQa+PXYPCPy6rbTrTtw7PHkccKrpp0yVhp5HdEIcKr6pLlVDBfOLX9QUsyCOV0wzfjIJNlGEYsdlLJizHhbn2mUjvSAHQqZETYP81eFzLQNnPHt4EVVUh7VfDESU84KezmD5QlWpXLmvU31/yMf+Se8xhHTvKSCZIFImWwoG6mbUoWf9nzpIoaSjB+weqqUUmpaaasXVal72J+UX2B+2RPW3RcT0eOzQgqlJL3RKrTJvdsjE3JEAvGq3lGHSZXy28G3skua2SmVi/w4yCE6gbODqnTWlg7+wC604ydGXA8VJiS5ap43JXiUFFAaQ==
+        sshPublicKey: >
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDoWD+BJPit/CBhYGn+CqC4RwdyFJqJqivgfkbLZtz2D84Y6lJfm9rEoGhJEb32/NELGTxhL0JmZj54jWUoVYfeJLpLTvIGJtFW4s3G6GSlc2g3HbaDe5wusnO1VdA/MEu/kkCu5yEFXHZN8waB85gaWznOlINJSo9UzzkKg4WfsFgCluAH4eM8Zr03e+Ti6YgzkA83beaFlBY5UQme7ReHKLKuuVcLLr5kKlHtv/fREPd2tp9V45OyMWN4hRpjw70CTEjIvh3lGg1Y7RLHrfY5RqGYnEtecqoGUCDwpL3TiQ/lUNzjC31WnrUo6HleKeV7n2LXMLsz6zRJLbod/B55S/KlUa8ElazZlYWvEdJIDmKG3D38F9Xlxm9MToQjo8GW8PzgRDQMETY6nYcjJRKbCFi3QeQ/JffCcTyZ8GDrpeeaO0ejP4U/oUItMzBc9tEsgD0vqUepM0EF4Ai5CssihThYA+gy+8wdIYzYujuKMZf4SGL0selhPoElGOfupj09PWxWTkuyzFyDEZ/IZ8tLH+/07UlLDk7iX8pDQuQ9muE+be4/qnYnbV0ab+pP8WAUZp2yOoTWQeMAi/0BS72bH73KMpMUo7pSNZuZjGLLhHHk0tx3mEipKd52u3aJagy4e5dfd7GIsDqq3qY5YLh2pzzzIcsB6F1Jd1CDMBG+nQ== brett.dellegrazie@gmail.com
+        sshKeySecureFile: 'vue-hello-world.key'
+
+    - task: Npm@1
+      displayName: 'Semantic Release'
+      inputs:
+        command: custom
+        customCommand: 'run semantic-release'
+      env:
+        GH_TOKEN: $(GH_TOKEN)
 
 - stage: provision
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
