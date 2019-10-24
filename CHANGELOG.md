@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.0](https://github.com/bdellegrazie/vue-hello-world/compare/v1.1.3...v2.0.0) (2019-10-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* **npm:** 
+
+### Continuous Integration
+
+* **npm:** use semantic release correctly ([7c68c71](https://github.com/bdellegrazie/vue-hello-world/commit/7c68c71f3326a47d37688f13d112be6ad18c7370))
+
 ### [1.1.3](https://github.com/bdellegrazie/vue-hello-world/compare/v1.1.2...v1.1.3) (2019-10-23)
 
 
