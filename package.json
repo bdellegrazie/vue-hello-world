@@ -9,6 +9,7 @@
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
     "semantic-release": "semantic-release",
+    "version": "npm run build",
     "cm": "git-cz"
   },
   "dependencies": {

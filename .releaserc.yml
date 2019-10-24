@@ -9,7 +9,7 @@ plugins:
     - npmPublish: false
       tarballDir: "pack"
   - - "semantic-release-ado"
-    - varName: "version"
+    - varName: "nextRelease"
       setOnlyOnRelease: true
   - - "@semantic-release/github"
     - assets:
