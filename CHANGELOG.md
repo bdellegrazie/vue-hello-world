@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+### [2.0.1](https://github.com/bdellegrazie/vue-hello-world/compare/v2.0.0...v2.0.1) (2019-10-26)
+
+
+### Bug Fixes
+
+* **packaging:** distribution should be binary, not source ([e173fa1](https://github.com/bdellegrazie/vue-hello-world/commit/e173fa174f81b7cb45e9040a5368e285977465ad))
+
 ## [2.0.0](https://github.com/bdellegrazie/vue-hello-world/compare/v1.1.3...v2.0.0) (2019-10-24)
 
 
