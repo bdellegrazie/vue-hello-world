@@ -177,7 +177,7 @@ stages:
       displayName: "Extract Distribution"
       inputs:
         archiveFilePatterns: '$(System.ArtifactsDirectory)/*.tgz'
-        destinationFolder: '$(System.ArtifactsDirectory)/dist'
+        destinationFolder: '$(System.ArtifactsDirectory)/tmp'
         cleanDestinationFolder: true
 
     - task: AzureCLI@1
@@ -185,7 +185,7 @@ stages:
       inputs:
         azureSubscription: ${{variables['azureSubscription']}}
         scriptLocation: 'inlineScript'
-        inlineScript: "az storage blob upload-batch -s '$(System.ArtifactsDirectory)/dist' -d \\$web --account-name '$(arm_storageAccountName)'"
+        inlineScript: "az storage blob upload-batch -s '$(System.ArtifactsDirectory)/tmp/package/dist' -d \\$web --account-name '$(arm_storageAccountName)'"
 
     - task: AzureCLI@1
       displayName: "Retrieve Web URL"

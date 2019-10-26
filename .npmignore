@@ -1,5 +1,4 @@
 .DS_Store
-/dist/
 /node_modules/
 /tests/unit/reports/
 /tests/e2e/reports/
@@ -22,3 +21,14 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+/azure/
+/pack/
+/public/
+/src/
+/tests/
+Jenkinsfile
+*.yml
+*.js
+*.json
+.*

@@ -13,7 +13,7 @@ plugins:
       setOnlyOnRelease: true
   - - "@semantic-release/github"
     - assets:
-        - name: "vue-hello-world-${nextRelease.gitTag}"
+        - name: "vue-hello-world-${nextRelease.gitTag}.tgz"
           label: "Vue Hello World (${nextRelease.gitTag}) distribution"
           path: "pack/*.tgz"
   - "@semantic-release/git"
