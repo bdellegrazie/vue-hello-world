@@ -1,17 +1,15 @@
 .DS_Store
+/coverage/
 /node_modules/
 /tests/unit/reports/
 /tests/e2e/reports/
 
 # local env files
-.env.local
-.env.*.local
+/.env.local
+/.env.*.local
 
 # Log files
-npm-debug.log*
-selenium-debug.log
-yarn-debug.log*
-yarn-error.log*
+/*.log*
 
 # Editor directories and files
 .idea
@@ -28,7 +26,7 @@ yarn-error.log*
 /src/
 /tests/
 Jenkinsfile
-*.yml
-*.js
-*.json
-.*
+/*.yml
+/*.js
+/*.json
+/.*
