@@ -110,7 +110,7 @@ stages:
       displayName: 'Publish Distribution'
       inputs:
         artifactName: 'distribution'
-        targetPath: '$(Build.SourcesDirectory)/pack/*.tgz'
+        targetPath: '$(Build.SourcesDirectory)/pack/vue-hello-world-$(nextRelease).tgz'
 
 - stage: provision
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['nextRelease'], ''))
