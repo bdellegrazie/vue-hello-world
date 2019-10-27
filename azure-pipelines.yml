@@ -113,7 +113,7 @@ stages:
         targetPath: '$(Build.SourcesDirectory)/pack/vue-hello-world-$(nextRelease).tgz'
 
 - stage: provision
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'), ne(variables['nextRelease'], ''))
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   variables:
     azureSubscription: ${{format('arm-{0}',variables['appName'])}}
     rgName: ${{format('rg-{0}',variables['appName'])}}
